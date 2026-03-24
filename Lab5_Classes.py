@@ -77,11 +77,8 @@ class ECG:
         '''
         This function return the total number of peaks
         '''
-        peaks = 0
-
-        #Your Code Here
-
-        return peaks
+        peaks = self.detect_peaks(signal, threshold)
+        return len(peaks)
 
     #6.2
     def rr_intervals(self, peaks, fs):
@@ -94,9 +91,9 @@ class ECG:
         Returns a list of RR intervals in seconds
         '''
         intervals = []
-
-        #Your Code Here
-
+        for i in range (1, len(peaks)):
+            interval = (peaks[i] - peaks [i - 1]) / fs
+            intervals.append(interval)
         return intervals
     
     #6.3
@@ -109,7 +106,9 @@ class ECG:
 
         Returns a boolean, True (1) if a proper signal, False (0) otherwise
         '''
-
+        if isinstance(signal, list) and len(signal) > 0:
+            return all(isinstance(i, (int, float)) for i in signal)
+        return False
     #7
     def heart_rate(self, peaks, fs):
         '''
@@ -118,8 +117,10 @@ class ECG:
         
         This function should return the heart rate in (BPM)
         '''
-        heartRate = 0
-
-        #Your Code Here
-
-        return heartRate
+        if len(peaks) < 2:
+            raise ValueError("Not enough peaks to calculate heart rate")
+    
+        intervals = self.rr_intervals(peaks, fs)
+        average_rr = sum(intervals) / len(intervals)
+        heart_rate = 60 / average_rr
+        return heart_rate
